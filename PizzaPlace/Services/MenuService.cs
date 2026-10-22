@@ -12,7 +12,7 @@ public class MenuService : IMenuService
             : StandardMenu();
         return new Menu("Title", menuItems);
     }
-    private ComparableList<MenuItem> StandardMenu()
+    protected ComparableList<MenuItem> StandardMenu()
     {
         var MenuItems = new ComparableList<MenuItem>();
         MenuItems.Add(new MenuItem("Prosciutto", PizzaRecipeType.StandardPizza, 14));
@@ -30,7 +30,7 @@ public class MenuService : IMenuService
 
         return MenuItems;
     }
-    private ComparableList<MenuItem> LuchMenu() {
+    protected ComparableList<MenuItem> LuchMenu() {
         var MenuItems = new ComparableList<MenuItem>();
         MenuItems.Add(new MenuItem("Margherita", PizzaRecipeType.StandardPizza, 10));
         MenuItems.Add(new MenuItem("Pepperoni", PizzaRecipeType.StandardPizza, 12));
