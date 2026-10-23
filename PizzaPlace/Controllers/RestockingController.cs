@@ -10,6 +10,10 @@ public class RestockingController(IStockRepository stockRepository) : Controller
     [HttpPost]
     public async Task<IActionResult> Restock([FromBody] ComparableList<StockDto> stock)
     {
-        throw new NotImplementedException("Restocking has not been implemented.");
+        foreach (var items in stock)
+        {
+           await stockRepository.AddToStock(items);
+        }
+        return Ok();
     }
 }
