@@ -43,6 +43,12 @@ public class ComparableList<T> : IList<T>
 
     public void Add(T item) => _list.Add(item);
 
+    // AddRange method to add multiple items at once
+    public void AddRange(IEnumerable<T> items) => _list.AddRange(items);
+
+    // AddRange method to add multiple items at once
+    public void ForEach(Action<T> action) => _list.ForEach(action);
+
     public void Clear() => _list.Clear();
 
     public bool Contains(T item) => _list.Contains(item);
