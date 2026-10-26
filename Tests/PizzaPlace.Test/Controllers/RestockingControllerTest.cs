@@ -10,10 +10,10 @@ namespace PizzaPlace.Test.Controllers;
 public class RestockingControllerTest
 {
     private static RestockingController GetRepository(Mock<IStockRepository> stockRepository) =>
-        new RestockingController(stockRepository.Object);
+        new(stockRepository.Object);
 
     [TestMethod]
-    public void Restock_AddsItemsToStock()
+    public async Task Restock_AddsItemsToStock()
     {
         // Arrange
         var anchovie = new StockDto(StockType.Anchovies, 5);
@@ -29,10 +29,10 @@ public class RestockingControllerTest
         var controller = GetRepository(stockRepository);
 
         // Act
-        var actual = controller.Restock(stock);
+        var actual = await controller.Restock(stock);
 
         // Assert
-        Assert.IsInstanceOfType<OkObjectResult>(actual);
+        Assert.IsInstanceOfType<OkResult>(actual);
         stockRepository.VerifyAll();
     }
 }
