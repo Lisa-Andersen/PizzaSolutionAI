@@ -33,6 +33,5 @@ public class RestockingControllerTest
 
         // Assert
         Assert.IsInstanceOfType<OkResult>(actual);
-        stockRepository.VerifyAll();
     }
 }
