@@ -9,7 +9,7 @@ public abstract class PizzaOven(TimeProvider timeProvider) : IPizzaOven
 {
     protected abstract int Capacity { get; }
     protected readonly ConcurrentQueue<(Func<Task<Pizza?>>, Guid)> _pizzaQueue = new();
-    private readonly Dictionary<Guid, Task<(Pizza?, Guid)>> _pizzasInOven = [];
+    protected readonly Dictionary<Guid, Task<(Pizza?, Guid)>> _pizzasInOven = [];
     private readonly object _ovenLock = new();
 
     public async Task<IEnumerable<Pizza>> PreparePizzas(ComparableList<PizzaPrepareOrder> order, ComparableList<StockDto> stock)
@@ -50,6 +50,8 @@ public abstract class PizzaOven(TimeProvider timeProvider) : IPizzaOven
 
     protected abstract void PlanPizzaMaking(IEnumerable<(PizzaRecipeDto Recipe, Guid Guid)> recipeOrders);
 
+    protected virtual bool CanBeCookedNow(Guid guid) => true;
+
     protected Task CookPizza(int cookingTimeMinutes) =>
         Task.Delay(TimeSpan.FromMinutes(cookingTimeMinutes), timeProvider);
 
@@ -87,17 +89,20 @@ public abstract class PizzaOven(TimeProvider timeProvider) : IPizzaOven
     {
         lock (_ovenLock)
         {
-            if (_pizzasInOven.Count < Capacity && _pizzaQueue.TryDequeue(out var value))
+            if (_pizzasInOven.Count < Capacity 
+                && _pizzaQueue.TryDequeue(out var value))
             {
                 var (pizzaTaskCreator, orderGuid) = value;
-                _pizzasInOven[orderGuid] = Wrap(pizzaTaskCreator(), orderGuid);
-
-                return true;
+                if (CanBeCookedNow(orderGuid))
+                {
+                    _pizzasInOven[orderGuid] = Wrap(pizzaTaskCreator(), orderGuid);
+                    return true;
+                }
+                else { 
+                _pizzaQueue.Enqueue(value); // Put it back in the queue if it can't be cooked now
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         static async Task<(Pizza?, Guid)> Wrap(Task<Pizza?> pizzaTask, Guid orderGuid) =>
