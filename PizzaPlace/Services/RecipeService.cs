@@ -20,4 +20,9 @@ public class RecipeService(IRecipeRepository recipeRepository) : IRecipeService
 
         return recipes;
     }
+
+    public async Task<long> AddRecipe(PizzaRecipeDto recipe)
+    {
+        return await recipeRepository.AddRecipe(recipe);
+    }
 }
