@@ -1,7 +1,10 @@
 using PizzaPlace;
+using PizzaPlace.Database;
 using PizzaPlace.Factories;
 using PizzaPlace.Repositories;
 using PizzaPlace.Services;
+
+Database.SetupTables();
 
 var builder = WebApplication.CreateBuilder(args);
 
