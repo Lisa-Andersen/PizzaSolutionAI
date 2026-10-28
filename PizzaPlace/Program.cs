@@ -34,7 +34,7 @@ var services = builder.Services;
 services.AddSingleton(TimeProvider.System);
 
 services.AddTransient<IStockRepository, FakeStockRepository>();
-services.AddTransient<IRecipeRepository, FakeRecipeRepository>();
+services.AddTransient<IRecipeRepository, RecipeRepository>();
 
 services.AddTransient<IPizzaOven, NormalPizzaOven>();
 services.AddTransient<IPizzaOven, AssemblyLinePizzaOven>();
