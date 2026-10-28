@@ -52,6 +52,21 @@ public class RecipeRepositoryTests
     }
 
     [TestMethod]
+    public async Task AddRecipe_WithExistingId()
+    {
+        // Arrange
+        await AddRecipe();
+        var recipe = new PizzaRecipeDto(PizzaRecipeType.OddPizza, [new StockDto(StockType.UnicornDust, 123), new StockDto(StockType.Anchovies, 1)], StandardCookingTime, 1);
+        var repository = GetRecipeRepository();
+
+        // Act
+        var ex = await Assert.ThrowsExceptionAsync<PizzaException>(() => repository.AddRecipe(recipe));
+
+        // Assert
+        Assert.AreEqual("Recipe already added for id 1.", ex.Message);
+    }
+
+    [TestMethod]
     public async Task GetRecipe()
     {
         // Arrange

@@ -13,6 +13,8 @@ public class FakeRecipeRepository : FakeDatabase<PizzaRecipeDto>, IRecipeReposit
         {
             if (Get(x => x.RecipeType == recipe.RecipeType).Any())
                 throw new PizzaException($"Recipe already added for {recipe.RecipeType}.");
+            if (Get(x => x.Id == recipe.Id).Any())
+                throw new PizzaException($"Recipe already added for id {recipe.Id}.");
 
             var id = Insert(recipe);
             return Task.FromResult(id);
