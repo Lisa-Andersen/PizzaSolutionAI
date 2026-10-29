@@ -33,7 +33,7 @@ builder.Services.AddOpenApiDocument(d =>
 var services = builder.Services;
 services.AddSingleton(TimeProvider.System);
 
-services.AddTransient<IStockRepository, FakeStockRepository>();
+services.AddTransient<IStockRepository, StockRepository>();
 services.AddTransient<IRecipeRepository, RecipeRepository>();
 
 services.AddTransient<IPizzaOven, NormalPizzaOven>();
