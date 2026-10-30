@@ -1,5 +1,4 @@
 ﻿using Npgsql;
-using PizzaPlace.Models;
 using PizzaPlace.Models.Types;
 
 namespace PizzaPlace.Database;
@@ -133,15 +132,15 @@ static class Database
         // Populate the ingredients table such that we can make a standard pizza
         Func<int> amountTimeGenerator = () => new Random().Next(1, 15); // Generate a random amount
         string insertSql = "INSERT INTO ingredients (PizzaTypeId, StockType, Amount) VALUES ";
-        insertSql += $"(1, '{StockType.Bacon}', {amountTimeGenerator()}), ";
-        insertSql += $"(1, '{StockType.Chocolate}', {amountTimeGenerator()}), ";
-        insertSql += $"(1, '{StockType.Dough}', {amountTimeGenerator()}); ";
+        insertSql += $"(1, '{StockType.Bacon}', 1), ";
+        insertSql += $"(1, '{StockType.Chocolate}', 1), ";
+        insertSql += $"(1, '{StockType.Dough}', 1); ";
         SqlRequest(insertSql);
 
 
         // Populate the pizza_recipe_dto table with the enum values if they don't exist
         string insertStock = "INSERT INTO stock_dto (StockType, Amount) VALUES ";
-        Func<int> amountGenerator = () => new Random().Next(20, 25); // Generate a random amount between 5 and 15 minutes
+        Func<int> amountGenerator = () => 100;// new Random().Next(20, 25); // Generate a random amount between 5 and 15 minutes
         foreach (var stockType in Enum.GetValues(typeof(StockType)))
         {
             insertStock += $"('{stockType}', {amountGenerator()}), ";
