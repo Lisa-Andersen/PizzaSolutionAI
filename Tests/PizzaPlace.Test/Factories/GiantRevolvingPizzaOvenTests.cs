@@ -102,4 +102,72 @@ public class GiantRevolvingPizzaOvenTests
         Assert.AreEqual(2, pizzas.Count(x => x is StandardPizza));
         Assert.AreEqual(1, pizzas.Count(x => x is ExtremelyTastyPizza));
     }
+
+
+    [TestMethod]
+    public async Task TotalCookingTime_OneHundredPizzas()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        ComparableList<PizzaPrepareOrder> order =
+        [
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestStandardPizzaRecipe(), 100),
+         ];
+        var stock = NormalPizzaOvenTests.GetPlentyStock();
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = NormalPizzaOvenTests.StandardPizzaPrepareTime;
+        var expectedPizzas = 100;
+
+        // Act
+        var actualCookingTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualCookingTime);
+    }
+
+    [TestMethod]
+    public async Task TotalCookingTime_241_Pizzas()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        ComparableList<PizzaPrepareOrder> order =
+        [
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestStandardPizzaRecipe(), 241),
+         ];
+        var stock = NormalPizzaOvenTests.GetPlentyStock();
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = NormalPizzaOvenTests.StandardPizzaPrepareTime * 3;
+
+        // Act
+        var actualCookingTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualCookingTime);
+    }
+
+    [TestMethod]
+    public async Task TotalCookingTime_MixedPizzas()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        ComparableList<PizzaPrepareOrder> order =
+        [
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestStandardPizzaRecipe(), 1),
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestTastyPizzaRecipe(), 1),
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestStandardPizzaRecipe(), 1),
+         ];
+        var stock = NormalPizzaOvenTests.GetPlentyStock();
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = NormalPizzaOvenTests.StandardPizzaPrepareTime + NormalPizzaOvenTests.TastyPizzaPrepareTime;
+
+
+        // Act
+        var actualCookingTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualCookingTime);
+    }
 }
