@@ -6,6 +6,7 @@ namespace PizzaPlace.Controllers;
 
 [Route("api/order")]
 public class OrderingController(
+    TimeProvider timeProvider,
     IOrderingService orderingService) : ControllerBase
 {
     [HttpPost]
@@ -13,7 +14,7 @@ public class OrderingController(
     {
         return Ok(new
         {
-            pizzas = await orderingService.HandlePizzaOrder(pizzaOrder),
+            pizzas = await orderingService.HandlePizzaOrder(timeProvider.GetUtcNow(), pizzaOrder),
         });
     }
 }
