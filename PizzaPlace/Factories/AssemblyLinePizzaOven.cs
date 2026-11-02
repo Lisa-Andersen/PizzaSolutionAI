@@ -19,6 +19,7 @@ public class AssemblyLinePizzaOven(TimeProvider timeProvider) : PizzaOven(timePr
 
     protected override void PlanPizzaMaking(IEnumerable<(PizzaRecipeDto Recipe, Guid Guid)> recipeOrders)
     {
+        recipeOrders = recipeOrders.OrderBy(r => r.Recipe.RecipeType);
         var prevRecipeType = PizzaRecipeType.EmptyPizza;
         var prevCookingTime = 0;
         foreach (var (recipe, orderGuid) in recipeOrders)
@@ -46,4 +47,34 @@ public class AssemblyLinePizzaOven(TimeProvider timeProvider) : PizzaOven(timePr
         
         return GetPizza(recipe.RecipeType);
     };
+
+    public override int TotalCookingTime(ComparableList<PizzaPrepareOrder> order)
+    {
+        var totalCookingTime = 0;
+        List<PizzaRecipeDto> pizzas = order
+            .SelectMany(o => Enumerable.Range(0, o.OrderAmount).Select(_ => (o.RecipeDto)))
+            .OrderBy(r => r.RecipeType)
+            .ToList();
+
+        var prevRecipeType = PizzaRecipeType.EmptyPizza;
+        var prevCookingTime = 0;
+        foreach (PizzaRecipeDto pizza in pizzas) {
+            var cookingTime = pizza.CookingTimeMinutes;
+            if (pizza.RecipeType == prevRecipeType)
+            {
+                cookingTime = Math.Max(prevCookingTime - 5, MinimumCookingTimeMinutes);
+                prevCookingTime = cookingTime;
+            }
+            else
+            {
+                cookingTime = pizza.CookingTimeMinutes + SetupTimeMinutes;
+                prevCookingTime = cookingTime;
+            }
+            prevRecipeType = pizza.RecipeType;
+
+            // Aggregate cooking time
+            totalCookingTime += prevCookingTime;
+        }
+        return totalCookingTime;
+    }
 }

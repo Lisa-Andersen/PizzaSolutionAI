@@ -50,6 +50,8 @@ public abstract class PizzaOven(TimeProvider timeProvider) : IPizzaOven
 
     protected abstract void PlanPizzaMaking(IEnumerable<(PizzaRecipeDto Recipe, Guid Guid)> recipeOrders);
 
+    public abstract int TotalCookingTime(ComparableList<PizzaPrepareOrder> order);
+
     protected virtual bool CanBeCookedNow(Guid guid) => true;
 
     protected Task CookPizza(int cookingTimeMinutes) =>

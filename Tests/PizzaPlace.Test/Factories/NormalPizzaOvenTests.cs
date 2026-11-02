@@ -122,6 +122,64 @@ public class NormalPizzaOvenTests
         Assert.AreEqual("Not enough ingredients to create all pizzas.", ex.Message);
     }
 
+    [TestMethod]
+    public async Task TotalCookingTime_OnePizza()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        var order = new ComparableList<PizzaPrepareOrder>
+        {
+            new PizzaPrepareOrder(GetTestStandardPizzaRecipe(), 1),
+        };
+        var stock = new ComparableList<StockDto>
+        {
+            new StockDto(StockType.Dough, 1),
+            new StockDto(StockType.Tomatoes, 2),
+            new StockDto(StockType.GratedCheese, 1),
+            new StockDto(StockType.GenericSpices, 1),
+        };
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = StandardPizzaPrepareTime;
+
+        // Act
+        var actualTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualTime);
+    }
+
+    [TestMethod]
+    public async Task TotalCookingTime_FivePizzas()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        var order = new ComparableList<PizzaPrepareOrder>
+        {
+            new PizzaPrepareOrder(GetTestStandardPizzaRecipe(), 2),
+            new PizzaPrepareOrder(GetTestTastyPizzaRecipe(), 3)
+        };
+        var stock = new ComparableList<StockDto>
+        {
+            new StockDto(StockType.Dough, 10),
+            new StockDto(StockType.Tomatoes, 20),
+            new StockDto(StockType.GratedCheese, 10),
+            new StockDto(StockType.GenericSpices, 10),
+            new StockDto(StockType.FermentedDough, 3),
+            new StockDto(StockType.RottenTomatoes, 10),
+            new StockDto(StockType.Bacon, 3),
+        };
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = StandardPizzaPrepareTime + TastyPizzaPrepareTime;
+
+        // Act
+        var actualTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualTime);
+    }
+
     public static PizzaRecipeDto GetTestStandardPizzaRecipe() =>
         new PizzaRecipeDto(PizzaRecipeType.StandardPizza, [
                 new StockDto(StockType.Dough, 1),

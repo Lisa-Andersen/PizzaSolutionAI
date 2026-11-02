@@ -111,4 +111,80 @@ public class AssemblyLinePizzaOvenTests
         Assert.AreEqual(10, pizzas.Count(x => x is ExtremelyTastyPizza));
         Assert.AreEqual(7, pizzas.Count(x => x is StandardPizza));
     }
+
+
+    [TestMethod]
+    public async Task TotalCookingTime_OnePizza()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        var order = new ComparableList<PizzaPrepareOrder>
+         {
+             new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestStandardPizzaRecipe(), 1),
+         };
+        var stock = NormalPizzaOvenTests.GetPlentyStock();
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = NormalPizzaOvenTests.StandardPizzaPrepareTime + AssemblyLinePizzaOven.SetupTimeMinutes;
+
+        // Act
+        var actualCookingTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualCookingTime);
+    }
+
+    [TestMethod]
+    public async Task TotalCookingTime_23_OfTheSameTypePizza()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        ComparableList<PizzaPrepareOrder> order =
+        [
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestTastyPizzaRecipe(), 23),
+         ];
+        var stock = NormalPizzaOvenTests.GetPlentyStock();
+
+        var oven = GetOven(timeProvider);
+        // NormalPizzaOvenTests.TastyPizzaPrepareTime + AssemblyLinePizzaOven.SetupTimeMinutes = 22
+        // AssemblyLinePizzaOven.SubsequentPizzaTimeSavingsInMinutes = 5
+        // AssemblyLinePizzaOven.MinimumCookingTimeMinutes = 4
+        var expectedTime = new[] {22, 17, 12, 7, 4,
+             4, 4, 4, 4, 4,
+             4, 4, 4, 4, 4,
+             4, 4, 4, 4, 4,
+             4, 4, 4}.Sum();
+
+        // Act
+        var actualCookingTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualCookingTime);
+    }
+
+    [TestMethod]
+    public async Task TotalCookingTime_MixedPizzaTypes()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider();
+        ComparableList<PizzaPrepareOrder> order =
+        [
+            new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestTastyPizzaRecipe(), 10),
+             new PizzaPrepareOrder(NormalPizzaOvenTests.GetTestStandardPizzaRecipe(), 7),
+         ];
+        var stock = NormalPizzaOvenTests.GetPlentyStock();
+
+        var oven = GetOven(timeProvider);
+        var expectedTime = new[] {22, 17, 12, 7, 4,
+             4, 4, 4, 4, 4,
+             17, 12, 7, 4, 4,
+             4, 4, }.Sum();
+
+
+        // Act
+        var actualCookingTime = oven.TotalCookingTime(order);
+
+        // Assert
+        Assert.AreEqual(expectedTime, actualCookingTime);
+    }
 }
