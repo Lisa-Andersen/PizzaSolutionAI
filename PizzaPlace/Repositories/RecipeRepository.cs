@@ -35,11 +35,11 @@ public class RecipeRepository : IRecipeRepository
                 $"RETURNING ID;";
         }
 
-        return DatabaseAddRecipe(insertRecipe, recipe.RecipeType);
+        return DatabaseAddRecipe(insertRecipe, recipe.RecipeType, recipe.Id);
     }
 
 
-    private async Task<long> DatabaseAddRecipe(string insertRecipe, PizzaRecipeType type)
+    private async Task<long> DatabaseAddRecipe(string insertRecipe, PizzaRecipeType type, long id)
     { 
         try
         {
@@ -49,7 +49,7 @@ public class RecipeRepository : IRecipeRepository
             return Convert.ToInt64(idRead);
         }
         catch (Exception) {
-            throw new PizzaException("Recipe already added for StandardPizza.");
+            throw new PizzaException($"Recipe already added for {type} or with id {id}.");
         }
     }
 
