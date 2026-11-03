@@ -52,7 +52,7 @@ public abstract class PizzaOven(TimeProvider timeProvider) : IPizzaOven
 
     public abstract int TotalCookingTime(ComparableList<PizzaPrepareOrder> order);
 
-    protected virtual bool CanBeCookedNow(Guid guid) => true;
+    protected virtual bool CanBeCookedNow() => _pizzasInOven.Count < Capacity;
 
     protected Task CookPizza(int cookingTimeMinutes) =>
         Task.Delay(TimeSpan.FromMinutes(cookingTimeMinutes), timeProvider);
@@ -91,18 +91,12 @@ public abstract class PizzaOven(TimeProvider timeProvider) : IPizzaOven
     {
         lock (_ovenLock)
         {
-            if (_pizzasInOven.Count < Capacity 
+            if (CanBeCookedNow()
                 && _pizzaQueue.TryDequeue(out var value))
             {
                 var (pizzaTaskCreator, orderGuid) = value;
-                if (CanBeCookedNow(orderGuid))
-                {
-                    _pizzasInOven[orderGuid] = Wrap(pizzaTaskCreator(), orderGuid);
-                    return true;
-                }
-                else { 
-                _pizzaQueue.Enqueue(value); // Put it back in the queue if it can't be cooked now
-                }
+                _pizzasInOven[orderGuid] = Wrap(pizzaTaskCreator(), orderGuid);
+                return true;
             }
             return false;
         }
