@@ -35,21 +35,27 @@ public class RecipeRepository : IRecipeRepository
                 $"RETURNING ID;";
         }
 
-        return DatabaseAddRecipe(insertRecipe, recipe.RecipeType);
+        return DatabaseAddRecipe(insertRecipe, recipe);
     }
 
 
-    private async Task<long> DatabaseAddRecipe(string insertRecipe, PizzaRecipeType type)
+    private async Task<long> DatabaseAddRecipe(string insertRecipe, PizzaRecipeDto recipe)
     { 
         try
         {
             object? idRead = await Database.Database.SqlAsyncRequestObject(insertRecipe);
             if (idRead == null)
                 throw new PizzaException("The Id is not found");
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                string insertIngredient = $"INSERT INTO {ingredientsTable} (PizzaTypeId, StockType, Amount) " +
+                    $"VALUES ({idRead}, '{ingredient.StockType}', {ingredient.Amount})";
+                await Database.Database.SqlAsyncRequestObject(insertIngredient);
+            }
             return Convert.ToInt64(idRead);
         }
         catch (Exception) {
-            throw new PizzaException("Recipe already added for StandardPizza.");
+            throw new PizzaException($"Recipe already added for {recipe.RecipeType} or with id {recipe.Id}.");
         }
     }
 

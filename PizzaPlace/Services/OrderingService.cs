@@ -21,7 +21,7 @@ public class OrderingService(
         var stock = await stockService.GetStock(order, recipes);
 
         // Create an identifier for the order, such that we can track the pizzas in the oven and match them to the order.
-        var orderId = new Guid();
+        var orderId = Guid.NewGuid();
         var prepareOrder = order.RequestedOrder
             .GroupBy(x => x.PizzaType)
             .Select(x => new PizzaPrepareOrder(GetPizzaRecipe(x.Key, recipes, orderId), x.Aggregate(0, (total, request) => total + request.Amount)))
