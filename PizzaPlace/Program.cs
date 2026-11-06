@@ -1,7 +1,10 @@
 using PizzaPlace;
+using PizzaPlace.Database;
 using PizzaPlace.Factories;
 using PizzaPlace.Repositories;
 using PizzaPlace.Services;
+
+Database.SetupTables();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +33,8 @@ builder.Services.AddOpenApiDocument(d =>
 var services = builder.Services;
 services.AddSingleton(TimeProvider.System);
 
-services.AddTransient<IStockRepository, FakeStockRepository>();
-services.AddTransient<IRecipeRepository, FakeRecipeRepository>();
+services.AddTransient<IStockRepository, StockRepository>();
+services.AddTransient<IRecipeRepository, RecipeRepository>();
 
 services.AddTransient<IPizzaOven, NormalPizzaOven>();
 services.AddTransient<IPizzaOven, AssemblyLinePizzaOven>();
